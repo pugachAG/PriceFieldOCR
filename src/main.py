@@ -14,8 +14,8 @@ class VanillaTesseractRecognizer:
             return api.GetUTF8Text()
 
 def main():
-    proc = OCRProcess("data/Fields.zip", name='big', max_files=10)
-    #proc = OCRProcess("data/Images.zip", "data/Images_expected.txt")
+    #proc = OCRProcess("data/Fields.zip", name='big', max_files=10)
+    proc = OCRProcess("data/Images.zip", "data/Images_expected.txt")
     #proc = OCRProcess("data/Images_OK.zip", "data/Images_OK_expected.txt")
     proc.run(DemoRecognizer())
 
