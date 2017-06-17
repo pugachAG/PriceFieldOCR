@@ -110,7 +110,7 @@ def crop_to_field_height(img):
         if score > best_score:
             best_score, best_area_info = score, base_area_info
 
-    margin = int(0.0*(best_area_info.max_i - best_area_info.min_i))
+    margin = int(0.17*(best_area_info.max_i - best_area_info.min_i))
     res = img[max(best_area_info.min_i-margin, 0):min(best_area_info.max_i+margin, h), 0:w]
     return res
 

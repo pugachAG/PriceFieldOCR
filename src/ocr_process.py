@@ -9,6 +9,32 @@ from collections import defaultdict
 PROCESS_FOLDER_NAME = "process"
 SOURCE_FOLDER = "source"
 
+
+def levenshtein(s1, s2):
+    if len(s1) < len(s2):
+        return levenshtein(s2, s1)
+
+    # len(s1) >= len(s2)
+    if len(s2) == 0:
+        return len(s1)
+
+    previous_row = range(len(s2) + 1)
+    for i, c1 in enumerate(s1):
+        current_row = [i + 1]
+        for j, c2 in enumerate(s2):
+            insertions = previous_row[j + 1] + 1 # j+1 instead of j since previous_row and current_row are one character longer
+            deletions = current_row[j] + 1       # than s2
+            substitutions = previous_row[j] + (c1 != c2)
+            current_row.append(min(insertions, deletions, substitutions))
+        previous_row = current_row
+    
+    return previous_row[-1]
+
+
+def calc_d(s1, s2):
+    return 1.0 - levenshtein(s1, s2)  / max(len(s1), len(s2))
+
+
 class OCRProcess:
     def __init__(self, zip_path, expected_path=None, max_files=2000, name='default', debug=False):
         self._debug = debug
@@ -98,10 +124,13 @@ class OCRProcess:
 
         report = ''
         total, success, colors = 0, 0, dict()
+        lev = 0.0
         for img_name in self._image_names:
             col = '#EDEDED'
             if img_name in self._expected:
+                s_expected, s_res = self._expected[img_name], result[img_name]
                 total += 1
+                lev += calc_d(s_expected, s_res)
                 if self._expected[img_name] == result[img_name]:
                     success += 1
                     col = '#85FFA6'
@@ -110,7 +139,7 @@ class OCRProcess:
             colors[img_name] = col
 
         if total > 0:
-            report += "<h3>Rate %d/%d = %d%%</h3>" % (success, total, int(100*success/total))
+            report += "<h3>Rate %d/%d = %d%%    Lev %f </h3>" % (success, total, int(100*success/total), lev/total)
         report += '<table border="1" style="width:100%">'
         report += "<tr>%s</tr>" % ''.join(map(lambda l: "<th>%s</th>" % l, headers))
         for img_name in sorted(self._image_names):
@@ -132,7 +161,6 @@ class OCRProcess:
         page = '<html><body>' + report + '</body></html>'
         with open(os.path.join(self._path, "index.html"), 'w') as fl:
             fl.write(page)
-
 
 
 
