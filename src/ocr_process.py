@@ -146,13 +146,17 @@ class OCRProcess:
         if total > 0:
             report += "<h3>Rate %d/%d = %d%%    Lev %f </h3>" % (success, total, int(100*success/total), lev/total)
 
-        plt.hist(all_lev)
-        plt.title("M2 Histogram")
-        plt.xlabel("M2 Value")
-        plt.ylabel("Number of images")
-        fig = plt.gcf()
-        plot_url = py.plot_mpl(fig, filename=recognizer.__class__.__name__, auto_open=False)
-        report += tls.get_embed(plot_url)
+        try:
+            plt.hist(all_lev)
+            plt.title("M2 Histogram")
+            plt.xlabel("M2 Value")
+            plt.ylabel("Number of images")
+            fig = plt.gcf()
+            plot_url = py.plot_mpl(fig, filename=recognizer.__class__.__name__, auto_open=False)
+            report += tls.get_embed(plot_url)
+        except:
+            logging.warn("Failed to generate plot")
+
 
         report += '<table border="1" style="width:100%">'
         report += "<tr>%s</tr>" % ''.join(map(lambda l: "<th>%s</th>" % l, headers))
