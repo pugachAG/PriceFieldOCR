@@ -5,6 +5,9 @@ import logging
 import cv2
 import time
 from collections import defaultdict
+import plotly.plotly as py
+import matplotlib.pyplot as plt
+import plotly.tools as tls
 
 PROCESS_FOLDER_NAME = "process"
 SOURCE_FOLDER = "source"
@@ -61,7 +64,7 @@ class OCRProcess:
             start = time.time()
             result[img_name] = recognizer.recognize(self, img)
             self.add_debug_info("Elapsed:%f" % (time.time()-start))
-        self._build_report(result)
+        self._build_report(recognizer, result)
 
     def dump_debug_img(self, label, img):
         if label not in self._labels:
@@ -114,7 +117,7 @@ class OCRProcess:
             os.makedirs(folder)
         return os.path.join(folder, img_name + '.png')
 
-    def _build_report(self, result):
+    def _build_report(self, recognizer, result):
         headers = ["name", "detected"]
         image_labels = [SOURCE_FOLDER]
         if self._debug:
@@ -124,13 +127,15 @@ class OCRProcess:
 
         report = ''
         total, success, colors = 0, 0, dict()
-        lev = 0.0
+        lev, all_lev = 0.0, list()
         for img_name in self._image_names:
             col = '#EDEDED'
             if img_name in self._expected:
                 s_expected, s_res = self._expected[img_name], result[img_name]
                 total += 1
-                lev += calc_d(s_expected, s_res)
+                lev_d = calc_d(s_expected, s_res)
+                lev += lev_d
+                all_lev.append(lev_d)
                 if self._expected[img_name] == result[img_name]:
                     success += 1
                     col = '#85FFA6'
@@ -140,6 +145,15 @@ class OCRProcess:
 
         if total > 0:
             report += "<h3>Rate %d/%d = %d%%    Lev %f </h3>" % (success, total, int(100*success/total), lev/total)
+
+        plt.hist(all_lev)
+        plt.title("M2 Histogram")
+        plt.xlabel("M2 Value")
+        plt.ylabel("Number of images")
+        fig = plt.gcf()
+        plot_url = py.plot_mpl(fig, filename=recognizer.__class__.__name__, auto_open=False)
+        report += tls.get_embed(plot_url)
+
         report += '<table border="1" style="width:100%">'
         report += "<tr>%s</tr>" % ''.join(map(lambda l: "<th>%s</th>" % l, headers))
         for img_name in sorted(self._image_names):

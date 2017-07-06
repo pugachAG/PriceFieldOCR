@@ -14,6 +14,7 @@ def main():
     #proc = OCRProcess("data/Images.zip", "data/Images_expected.txt", max_files=10, debug=True)
     proc = OCRProcess("data/Images.zip", "data/Images_expected.txt")
     proc.run(VanillaTesseractRecognizer())
+    #proc.run(Step1Recognizer())
 
 if __name__ == "__main__":
     main()

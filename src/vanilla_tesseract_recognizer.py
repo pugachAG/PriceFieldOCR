@@ -1,7 +1,7 @@
 from tesserocr import PyTessBaseAPI, PSM
 from img_utils import *
 
-# Rate 29/197 = 14%
+# Rate 29/198 = 14% Lev 0.484381
 class VanillaTesseractRecognizer:
     def recognize(self, proc, img):
         with PyTessBaseAPI() as api:
