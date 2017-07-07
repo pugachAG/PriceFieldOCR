@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from img_utils import WHITE, BLACK
+from img_utils import WHITE, BLACK, create_empty_img
 
 class ConnectedAreaInfo:
     def __init__(self, points, weight):

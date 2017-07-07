@@ -1,5 +1,6 @@
 from tesserocr import PyTessBaseAPI, PSM
 from img_utils import *
+from common import *
 
 class DemoRecognizer:
     def recognize(self, proc, img):
