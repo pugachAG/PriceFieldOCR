@@ -135,3 +135,17 @@ def extract_chars(img):
         minus,
         chars,
     )
+
+
+def format_field(field_str):
+    price = ''.join(filter(set("-$0123456789").__contains__, field_str))
+    res, chars_cnt = '', 0
+    for ch in price[::-1]:
+        if ch.isdigit():
+            if chars_cnt == 2:
+                res += '.'
+            if chars_cnt > 2 and chars_cnt%3 == 2:
+                res += ','
+            chars_cnt += 1
+        res += ch
+    return res[::-1]

@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.DEBUG, format='%(levelname)-5s %(message)s')
 
 
 def main():
-    #proc = OCRProcess("data/Images.zip", "data/Images_expected.txt", max_files=10, debug=True)
+    #proc = OCRProcess("data/Images.zip", "data/Images_expected.txt", max_files=20)
     proc = OCRProcess("data/Images.zip", "data/Images_expected.txt")
     proc.run(DemoRecognizer())
     #proc.run(Step1Recognizer())
