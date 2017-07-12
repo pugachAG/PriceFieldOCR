@@ -1,6 +1,6 @@
 from tesserocr import PyTessBaseAPI, PSM
 from img_utils import resize_to_height, to_binary
-from common import crop_to_field_height, find_connected_areas, format_field
+from common import crop_to_field_height, format_field
 
 # Rate 33/197 = 16% Lev 0.577518
 class Step1Recognizer:

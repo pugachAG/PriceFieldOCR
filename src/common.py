@@ -112,7 +112,7 @@ def check_minus_sign(img, sign_from, sign_to):
     return False
 
 
-def extract_chars(img):
+def extract_chars(img, apply_morphologyEx):
     h, w = img.shape[:2]
     areas = find_connected_areas(img, lambda h, i: int(0.8*h));
     filtered_img = create_empty_img(h, w)
@@ -130,11 +130,10 @@ def extract_chars(img):
                 minus = check_minus_sign(img, max(char_area.min_j-int(1.2*h), 0), char_area.min_j)
             #chars.append(img[0:h, char_area.min_j:char_area.max_j])
 
-    return (
-        cv2.morphologyEx(filtered_img, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(3,3)), iterations=3),
-        minus,
-        chars,
-    )
+    if apply_morphologyEx:
+        filtered_img = cv2.morphologyEx(filtered_img, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(3,3)), iterations=3)
+
+    return (filtered_img, minus, chars)
 
 
 def format_field(field_str):
