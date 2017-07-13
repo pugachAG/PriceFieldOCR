@@ -12,10 +12,10 @@ logging.basicConfig(level=logging.DEBUG, format='%(levelname)-5s %(message)s')
 
 
 def main():
-    #proc = OCRProcess("data/Images.zip", "data/Images_expected.txt", max_files=20)
-    proc = OCRProcess("data/Images.zip", "data/Images_expected.txt")
+    proc = OCRProcess("data/DemoImages.zip", "data/Images_expected.txt", debug=True)
+    #proc = OCRProcess("data/Images.zip", "data/Images_expected.txt")
     #proc.run(DemoRecognizer())
-    proc.run(FinalRecognizer(True))
+    proc.run(VanillaTesseractRecognizer())
 
 if __name__ == "__main__":
     main()

@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import plotly.tools as tls
 
 PROCESS_FOLDER_NAME = "process"
-SOURCE_FOLDER = "source"
+SOURCE_FOLDER = "input"
 
 
 def levenshtein(s1, s2):
@@ -118,36 +118,35 @@ class OCRProcess:
         return os.path.join(folder, img_name + '.png')
 
     def _build_report(self, recognizer, result):
-        headers = ["name", "detected"]
         image_labels = [SOURCE_FOLDER]
         if self._debug:
-            headers.extend(["expected", "debug_info"])
             image_labels.extend(list(self._labels))
-        headers.extend(image_labels)
+        headers = list(image_labels)
+        headers.append("detected")
+        if self._debug:
+            headers.extend(["expected", "M2"])
 
         report = ''
         total, success, colors = 0, 0, dict()
-        lev, all_lev = 0.0, list()
+        lev, all_lev = 0.0, dict()
         for img_name in self._image_names:
-            col = '#EDEDED'
+            col = "rgba(255, 255, 255, 0.1)"
             if img_name in self._expected:
                 s_expected, s_res = self._expected[img_name], result[img_name]
                 total += 1
                 lev_d = calc_d(s_expected, s_res)
                 lev += lev_d
-                all_lev.append(lev_d)
+                all_lev[img_name] = lev_d
                 if self._expected[img_name] == result[img_name]:
                     success += 1
-                    col = '#85FFA6'
-                else:
-                    col = '#FF8080'
+                col = "rgba({0}, {1}, 0, 0.1)".format(*list((min(int(2*255*x), 255) for x in [1.0-lev_d, lev_d])))
             colors[img_name] = col
 
         if total > 0:
             report += "<h3>Rate %d/%d = %d%%    Lev %f </h3>" % (success, total, int(100*success/total), lev/total)
 
         try:
-            plt.hist(all_lev)
+            plt.hist(list(all_lev.values()))
             plt.title("M2 Histogram")
             plt.xlabel("M2 Value")
             plt.ylabel("Number of images")
@@ -161,17 +160,15 @@ class OCRProcess:
         report += '<table border="1" style="width:100%">'
         report += "<tr>%s</tr>" % ''.join(map(lambda l: "<th>%s</th>" % l, headers))
         for img_name in sorted(self._image_names):
-            rows = [
-                img_name,
-                result[img_name],
-            ]
-            if self._debug:
-                rows.append(self._debug_info.get(img_name, ""))
-                rows.append(self._expected[img_name] if img_name in self._expected else "NOT AVAILABLE")
-
+            rows = list()
             for lbl in image_labels:
                 rows.append('<img src="%s">' % os.path.join(lbl, img_name + '.png'))
-            report += "<tr bgcolor=\"%s\">%s</tr>" % (colors[img_name], ''.join(map(lambda l: "<td>%s</td>" % l, rows)))
+            rows.append(result[img_name])
+            if self._debug:
+                rows.append(self._expected[img_name] if img_name in self._expected else "NOT AVAILABLE")
+                rows.append("{0:.2f}".format(all_lev[img_name]))
+
+            report += "<tr style=\"background-color:%s;\">%s</tr>" % (colors[img_name], ''.join(map(lambda l: "<td>%s</td>" % l, rows)))
         report += '</table>'
         self._save_report(report)
 
