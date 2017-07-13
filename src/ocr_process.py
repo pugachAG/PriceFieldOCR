@@ -157,23 +157,24 @@ class OCRProcess:
             logging.warn("Failed to generate plot")
 
 
-        report += '<table border="1" style="width:100%">'
-        report += "<tr>%s</tr>" % ''.join(map(lambda l: "<th>%s</th>" % l, headers))
+        report += '<table border="1" align="center">'
+        report += "<tr>{0}</tr>".format(''.join(map(lambda l: "<th>{0}</th>".format(l), headers)))
         for img_name in sorted(self._image_names):
             rows = list()
             for lbl in image_labels:
-                rows.append('<img src="%s">' % os.path.join(lbl, img_name + '.png'))
+                rows.append('<img width="300" src="%s">' % os.path.join(lbl, img_name + '.png'))
             rows.append(result[img_name])
             if self._debug:
                 rows.append(self._expected[img_name] if img_name in self._expected else "NOT AVAILABLE")
                 rows.append("{0:.2f}".format(all_lev[img_name]))
 
-            report += "<tr style=\"background-color:%s;\">%s</tr>" % (colors[img_name], ''.join(map(lambda l: "<td>%s</td>" % l, rows)))
+            report += "<tr style=\"background-color:{0};\">{1}</tr>".format(colors[img_name],
+                    ''.join(map(lambda l: '<td align="center" style="padding: 5px;">{0}</td>'.format(l), rows)))
         report += '</table>'
         self._save_report(report)
 
     def _save_report(self, report):
-        page = '<html><body>' + report + '</body></html>'
+        page = '<html><body>{0}</body></html>'.format(report)
         with open(os.path.join(self._path, "index.html"), 'w') as fl:
             fl.write(page)
 
