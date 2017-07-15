@@ -114,7 +114,6 @@ def check_minus_sign(img, sign_from, sign_to):
 
 def extract_chars(img, apply_morphologyEx):
     h, w = img.shape[:2]
-    areas = find_connected_areas(img, lambda h, i: int(0.8*h));
     filtered_img = create_empty_img(h, w)
     minus = False
     was_dollar = False
